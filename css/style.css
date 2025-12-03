@@ -1,0 +1,17 @@
+.status.ok {
+  background: #062b19;
+  color: #7ee198;
+}
+
+.status.ok span.dot {
+  background: #22c55e;
+}
+
+.status.warn {
+  background: #3b1114;
+  color: #fda4af;
+}
+
+.status.warn span.dot {
+  background: #fb7185;
+}
