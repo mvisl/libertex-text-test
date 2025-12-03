@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Title Length Tester (124px / 2 lines)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- Roboto font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;600&display=swap"
+    rel="stylesheet"
+  >
+  <style>
+    :root {
+      --tile-width: 124px;
+      --font-size: 15px;
+      --line-height: 20px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 24px;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #0b0c10;
+      color: #f5f5f5;
+    }
+
+    h1 {
+      font-size: 18px;
+      margin-bottom: 8px;
+    }
+
+    p {
+      font-size: 13px;
+      margin: 4px 0 12px;
+      color: #c7c7c7;
+      max-width: 480px;
+    }
+
+    textarea {
+      width: 100%;
+      max-width: 480px;
+      min-height: 80px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid #444;
+      background: #11141a;
+      color: #fff;
+      resize: vertical;
+      font-size: 14px;
+      font-family: inherit;
+    }
+
+    textarea:focus {
+      outline: none;
+      border-color: #ff8c3a;
+      box-shadow: 0 0 0 1px #ff8c3a44;
+    }
+
+    .preview-wrapper {
+      margin-top: 18px;
+      display: flex;
+      gap: 24px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+
+    .preview-column {
+      min-width: 200px;
+    }
+
+    .preview-label {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #9ca3af;
+      margin-bottom: 6px;
+    }
+
+    .tile-preview {
+      width: var(--tile-width);
+      border-radius: 10px;
+      padding: 10px 8px;
+      background: #151823;
+      border: 1px solid #333a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .tile-preview-inner {
+      width: 100%;
+      font-family: "Roboto", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: var(--font-size);
+      line-height: var(--line-height);
+      font-weight: 400;
+      color: #ffffff;
+      text-align: center;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      /* важное: высота не фиксирована, просто считаем строки по scrollHeight */
+    }
+
+    .status {
+      margin-top: 8px;
+      font-size: 13px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 8px;
+      border-radius: 999px;
+    }
+
+    .status span.dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      display: inline-block;
+    }
+
+    .status.ok {
+      background: #062b19;
+      color: #7ee198;
+    }
+
+    .status.ok span.dot {
+      background: #22c55e;
+    }
+
+    .status.warn {
+      background: #3b1114;
+      color: #fda4af;
+    }
+
+    .status.warn span.dot {
+      background: #fb7185;
+    }
+
+    .metrics {
+      margin-top: 6px;
+      font-size: 12px;
+      color: #9ca3af;
+    }
+
+    .hint-list {
+      margin-top: 12px;
+      font-size: 12px;
+      color: #9ca3af;
+      padding-left: 18px;
+    }
+
+    .hint-list li {
+      margin-bottom: 4px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Title tester (124px / max 2 lines)</h1>
+  <p>
+    Paste your translation below. The preview shows how it will look inside a
+    124&nbsp;px-wide tile with <b>Roboto 15px / line-height 20px</b>.  
+    If it overflows to a 3rd line, please shorten the text.
+  </p>
+
+  <textarea
+    id="input"
+    placeholder="Type or paste your title here… (e.g. Yesterday's Top Asset)"
+  ></textarea>
+
+  <div class="preview-wrapper">
+    <div class="preview-column">
+      <div class="preview-label">Preview</div>
+      <div class="tile-preview">
+        <div id="preview" class="tile-preview-inner"></div>
+      </div>
+
+      <div id="status" class="status ok">
+        <span class="dot"></span>
+        <span>Fits in 2 lines</span>
+      </div>
+
+      <div id="metrics" class="metrics"></div>
+    </div>
+
+    <div class="preview-column">
+      <div class="preview-label">Guidelines</div>
+      <ul class="hint-list">
+        <li>Maximum <b>2 lines</b> inside 124&nbsp;px width.</li>
+        <li>Prefer <b>up to 3 short words</b>.</li>
+        <li>Avoid very long compound words.</li>
+        <li>If it doesn't fit: use a <b>shorter alternative</b>.</li>
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    const input = document.getElementById('input');
+    const preview = document.getElementById('preview');
+    const status = document.getElementById('status');
+    const metrics = document.getElementById('metrics');
+
+    function update() {
+      const text = input.value.trim();
+      preview.textContent = text || 'Sample title';
+
+      // ждём, пока браузер нарисует текст, чтобы корректно получить scrollHeight
+      requestAnimationFrame(() => {
+        const lineHeight = parseFloat(
+          getComputedStyle(preview).lineHeight
+        ) || 20;
+
+        const height = preview.scrollHeight;
+        const lines = Math.round(height / lineHeight);
+
+        if (lines <= 2) {
+          status.className = 'status ok';
+          status.lastElementChild.textContent = 'Fits in 2 lines';
+        } else {
+          status.className = 'status warn';
+          status.lastElementChild.textContent = `Too long (${lines} lines) – please shorten`;
+        }
+
+        metrics.textContent =
+          `Characters: ${text.length} · Estimated lines: ${lines}`;
+      });
+    }
+
+    input.addEventListener('input', update);
+    // initial
+    update();
+  </script>
+</body>
+</html>
