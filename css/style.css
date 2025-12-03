@@ -43,21 +43,23 @@ p {
     color: #777777;
 }
 
+/* статусные тексты */
+
 .status {
     margin-top: 12px;
     font-size: 16px;
 }
 
 .status.ok {
-    color: #58ff58;
+    color: #58ff58;      /* зелёный */
 }
 
 .status.warn {
-    color: #ff5d5d;
+    color: #ff5d5d;      /* красный */
 }
 
 .status.warn-soft {
-    color: #ffd75d;                /* мягкое предупреждение (жёлтое) */
+    color: #ffd75d;      /* жёлтый */
 }
 
 .metrics {
