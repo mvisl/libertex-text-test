@@ -16,10 +16,10 @@
     <strong>124 px</strong>. If the text overflows to a 3rd line, please shorten it.
 </p>
 
-<!-- Видимый тайл для переводчиков -->
+<!-- Видимый тайл -->
 <div id="preview" class="preview" contenteditable="true"></div>
 
-<!-- Скрытый близнец только для измерения высоты текста -->
+<!-- Скрытый двойник для точного измерения высоты текста -->
 <div id="measure" class="preview preview-measure" aria-hidden="true"></div>
 
 <div id="status" class="status">Waiting...</div>
@@ -43,8 +43,8 @@
     const status   = document.getElementById("status");
     const metrics  = document.getElementById("metrics");
 
-    const LINE_HEIGHT = 20;           // px, как в дизайне
-    const LONG_WORD_LIMIT = 14;       // длина слова для жёлтого предупреждения
+    const LINE_HEIGHT = 20;          // px, как в дизайне
+    const LONG_WORD_LIMIT = 14;      // длина слова для жёлтого ворнинга
 
     let isPlaceholder = true;
 
@@ -52,7 +52,7 @@
         isPlaceholder = true;
         preview.classList.add("placeholder");
         preview.textContent = "Type here…";
-        update(true); // считать как пустое поле
+        update(true); // считаем как пустое поле
     }
 
     function clearPlaceholder() {
@@ -68,27 +68,28 @@
     }
 
     function update(forceEmpty) {
-        let text = forceEmpty ? "" : getText();
+        const text = forceEmpty ? "" : getText();
 
-        // Обновляем скрытый измеритель
+        // обновляем скрытый измеритель
         measure.textContent = text || " "; // чтобы высота не была 0
 
         const height = measure.scrollHeight;
         let lines = Math.round(height / LINE_HEIGHT);
-        if (!text) {
-            lines = 1; // пустое поле считаем как 1 строку
-        }
+        if (!text) lines = 1;
 
         const chars = text.length;
 
-        // Находим самое длинное слово
+        // самое длинное слово
         let longestWord = 0;
         if (text) {
             const words = text.split(/\s+/).filter(Boolean);
-            longestWord = words.reduce((max, w) => Math.max(max, w.length), 0);
+            longestWord = words.reduce(
+                (max, w) => Math.max(max, w.length),
+                0
+            );
         }
 
-        // Состояние и сообщение
+        // состояние
         if (!text) {
             status.className = "status";
             status.textContent = "Waiting...";
@@ -108,20 +109,18 @@
             `Characters: ${chars} · Estimated lines: ${lines} · Longest word: ${longestWord}`;
     }
 
-    // Слушатели
+    // события
     preview.addEventListener("focus", () => {
         clearPlaceholder();
     });
 
     preview.addEventListener("blur", () => {
-        if (!getText()) {
-            setPlaceholder();
-        }
+        if (!getText()) setPlaceholder();
     });
 
     preview.addEventListener("input", () => update(false));
 
-    // Стартовое состояние
+    // старт
     setPlaceholder();
 })();
 </script>
