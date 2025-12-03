@@ -36,16 +36,16 @@ const preview = document.getElementById('preview');
 const status  = document.getElementById('status');
 const metrics = document.getElementById('metrics');
 
-// основная функция проверки
 function update() {
     const rawText = preview.innerText.replace(/\n+$/g, '').trim();
-    requestAnimationFrame(() => {
-        const style = getComputedStyle(preview);
-        const lineHeight   = parseFloat(style.lineHeight)   || 20;
-        const paddingTop   = parseFloat(style.paddingTop)   || 0;
-        const paddingBottom= parseFloat(style.paddingBottom)|| 0;
 
-        // высота содержимого без паддингов
+    requestAnimationFrame(() => {
+        const style        = getComputedStyle(preview);
+        const lineHeight   = parseFloat(style.lineHeight)    || 20;
+        const paddingTop   = parseFloat(style.paddingTop)    || 0;
+        const paddingBottom= parseFloat(style.paddingBottom) || 0;
+
+        // высота только текста, без паддингов
         const contentHeight = preview.scrollHeight - paddingTop - paddingBottom;
         const lines = Math.max(1, Math.round(contentHeight / lineHeight));
 
@@ -76,11 +76,9 @@ function update() {
     });
 }
 
-// слушаем ввод
 preview.addEventListener('input', update);
 preview.addEventListener('keyup', update);
 
-// первая инициализация
 update();
 </script>
 
