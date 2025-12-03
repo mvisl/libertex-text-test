@@ -1,4 +1,4 @@
-/* Общий фон и типографика */
+/* Фон и базовая типографика */
 body {
     margin: 0;
     padding: 40px;
@@ -29,11 +29,15 @@ ul {
     padding-left: 20px;
 }
 
-/* Тайл превью — точное соответствие тайлу в приложении */
+/* Тайл превью — строго 2 строки по 20px */
 .preview {
     width: 124px;
-    height: 40px;              /* 2 строки × 20px */
-    padding: 10px 12px;        /* вертикальный паддинг здесь чисто визуальный */
+
+    /* 2 строки по 20px */
+    min-height: 40px;
+    max-height: 40px;
+
+    padding: 0 12px;          /* только по бокам, чтобы не съедать высоту строк */
     box-sizing: border-box;
 
     background: #161616;
@@ -44,11 +48,18 @@ ul {
     line-height: 20px;
     color: #ffffff;
 
-    overflow: hidden;          /* физически обрезаем всё, что выше 2-х строк */
+    overflow: hidden;          /* физически обрезаем всё выше 2 строк */
     white-space: normal;
     word-break: break-word;
 
+    display: flex;
+    align-items: center;       /* чтобы однострочный текст не прилипал к верху */
     outline: none;
+}
+
+/* Внутренний текст превью (для выравнивания по верхнему краю) */
+.preview[contenteditable="true"] {
+    align-items: flex-start;
 }
 
 /* Плейсхолдер */
@@ -61,14 +72,17 @@ ul {
     position: absolute;
     left: -9999px;
     top: -9999px;
-    height: auto;
+
+    min-height: auto;
     max-height: none;
+    padding: 0 12px;
     border: none;
-    padding: 10px 12px;
     overflow: visible;
+
+    display: block;
 }
 
-/* Статус */
+/* Статусы */
 .status {
     margin-top: 16px;
     font-size: 16px;
@@ -77,17 +91,17 @@ ul {
 
 /* Зелёный — всё ок */
 .status-ok {
-    color: #4ade80; /* зелёный */
+    color: #4ade80;
 }
 
-/* Жёлтое предупреждение для длинного слова */
+/* Жёлтый ворнинг для длинного слова */
 .status-warn {
-    color: #facc15; /* жёлтый */
+    color: #facc15;
 }
 
-/* Красная ошибка — больше 2 строк */
+/* Красный — больше 2 строк */
 .status-error {
-    color: #f97373; /* красный */
+    color: #f97373;
 }
 
 /* Метрики */
