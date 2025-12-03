@@ -1,8 +1,7 @@
 body {
     background: #0d0d0d;
-    color: #ffffff;
-    font-family: Roboto, system-ui, -apple-system, BlinkMacSystemFont,
-                 "Segoe UI", sans-serif;
+    color: #fff;
+    font-family: Roboto, sans-serif;
     padding: 40px;
 }
 
@@ -14,65 +13,55 @@ h1 {
 p {
     max-width: 800px;
     line-height: 1.5;
-    color: #bbbbbb;
+    color: #bbb;
 }
 
 .preview {
     width: 124px;
     min-height: 40px;
-    max-height: 40px;              /* ровно 2 строки при line-height 20px */
+    max-height: 40px; /* exactly 2 lines */
     padding: 12px;
-
     background: #1a1a1a;
-    border: 2px solid #333333;
+    border: 2px solid #333;
     border-radius: 12px;
 
     font-family: Roboto, sans-serif;
     font-size: 15px;
     line-height: 20px;
 
-    overflow: hidden;              /* третью строку не показываем */
+    overflow: hidden; /* prevent 3rd line */
     white-space: normal;
     word-break: break-word;
 
     outline: none;
-    color: #ffffff;
+    color: #fff;
 }
-
-.preview.placeholder {
-    color: #777777;
-}
-
-/* статусные тексты */
 
 .status {
     margin-top: 12px;
     font-size: 16px;
 }
 
+/* green */
 .status.ok {
-    color: #58ff58;      /* зелёный */
+    color: #58ff58;
 }
 
+/* red */
 .status.warn {
-    color: #ff5d5d;      /* красный */
+    color: #ff5d5d;
 }
 
+/* yellow for long-word warning */
 .status.warn-soft {
-    color: #ffd75d;      /* жёлтый */
+    color: #ffd75d;
 }
 
 .metrics {
     margin-top: 8px;
-    color: #aaaaaa;
-    font-size: 14px;
-}
-
-h2 {
-    margin-top: 32px;
+    color: #aaa;
 }
 
 ul {
-    margin-top: 12px;
-    padding-left: 20px;
+    margin-top: 24px;
 }
