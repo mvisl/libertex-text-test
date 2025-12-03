@@ -18,7 +18,7 @@
 
 <div id="preview" class="preview" contenteditable="true"></div>
 
-<div class="status" id="status">Waiting…</div>
+<div class="status" id="status">Waiting...</div>
 
 <div class="metrics" id="metrics">
     Characters: 0 · Estimated lines: 1 · Longest word: 0
@@ -38,32 +38,41 @@ const status  = document.getElementById("status");
 const metrics = document.getElementById("metrics");
 
 const PLACEHOLDER = "Type here…";
-const LONG_WORD_LIMIT = 14; // после этого считаем слово «очень длинным»
-let isPristine = true;
+const LONG_WORD_LIMIT = 14;
 
-// ----- placeholder -----
-function setPlaceholder() {
-    isPristine = true;
+// ----- placeholder helpers -----
+function showPlaceholder() {
     preview.textContent = PLACEHOLDER;
     preview.classList.add("placeholder");
 
     status.className = "status";
-    status.textContent = "Waiting…";
-    metrics.textContent = "Characters: 0 · Estimated lines: 1 · Longest word: 0";
+    status.textContent = "Waiting...";
+    metrics.textContent =
+        "Characters: 0 · Estimated lines: 1 · Longest word: 0";
 }
 
-function clearPlaceholderIfNeeded() {
-    if (!isPristine) return;
-    isPristine = false;
-    preview.textContent = "";
-    preview.classList.remove("placeholder");
+function hidePlaceholder() {
+    if (preview.classList.contains("placeholder")) {
+        preview.textContent = "";
+        preview.classList.remove("placeholder");
+    }
 }
 
 // ----- main update -----
 function update() {
-    if (isPristine) return;
+    // если сейчас показывается плейсхолдер — просто выходим
+    if (preview.classList.contains("placeholder")) {
+        return;
+    }
 
     requestAnimationFrame(() => {
+        const text = preview.innerText.trim();
+
+        if (text.length === 0) {
+            showPlaceholder();
+            return;
+        }
+
         const style         = getComputedStyle(preview);
         const lineHeight    = parseFloat(style.lineHeight);
         const paddingTop    = parseFloat(style.paddingTop);
@@ -72,14 +81,6 @@ function update() {
         const rawHeight     = preview.scrollHeight;
         const contentHeight = rawHeight - paddingTop - paddingBottom;
         const lines         = Math.max(1, Math.round(contentHeight / lineHeight));
-
-        const text   = preview.innerText.trim();
-        const length = text.length;
-
-        if (length === 0) {
-            setPlaceholder();
-            return;
-        }
 
         // поиск самого длинного слова
         const words = text.split(/\s+/).filter(Boolean);
@@ -90,33 +91,40 @@ function update() {
 
         if (lines > 2) {
             status.className = "status warn";
-            status.textContent = `✘ Too long (${lines} lines) — please shorten`;
+            status.textContent =
+                `✘ Too long (${lines} lines) — please shorten`;
         } else if (longestWord > LONG_WORD_LIMIT) {
             status.className = "status warn-soft";
             status.textContent =
-                "✔ Fits in 2 lines, but contains a very long word — please shorten if possible.";
+                "✔ Fits in 2 lines, but contains a very long word — shorten if possible.";
         } else {
             status.className = "status ok";
             status.textContent = "✔ Fits in 2 lines";
         }
 
         metrics.textContent =
-            `Characters: ${length} · Estimated lines: ${lines} · Longest word: ${longestWord}`;
+            `Characters: ${text.length} · Estimated lines: ${lines} · Longest word: ${longestWord}`;
     });
 }
 
 // события
 preview.addEventListener("focus", () => {
-    clearPlaceholderIfNeeded();
+    hidePlaceholder();
+});
+
+preview.addEventListener("blur", () => {
+    const text = preview.innerText.trim();
+    if (!text.length) {
+        showPlaceholder();
+    }
 });
 
 preview.addEventListener("input", () => {
-    clearPlaceholderIfNeeded();
     update();
 });
 
 // старт
-setPlaceholder();
+showPlaceholder();
 </script>
 
 </body>
