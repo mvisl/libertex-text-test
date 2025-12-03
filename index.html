@@ -7,88 +7,112 @@
     <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
+    <h1>Title tester (124px / max 2 lines)</h1>
 
-<h1>Title tester (124px / max 2 lines)</h1>
+    <p>
+        Type your translation directly in the preview tile below. It uses
+        <strong>Roboto 15px / line-height 20px</strong> and fixed width
+        <strong>124 px</strong>. If the text overflows to a 3rd line, please
+        shorten it.
+    </p>
 
-<p>
-    Type your translation directly in the preview tile below.
-    It uses <strong>Roboto 15px / line-height 20px</strong>
-    and fixed width <strong>124 px</strong>.
-    If the text overflows to a 3rd line, please shorten it.
-</p>
+    <div class="tester">
+        <div
+            id="preview"
+            class="preview"
+            contenteditable="true"
+            spellcheck="false"
+            data-placeholder="Type here…"
+        ></div>
 
-<div id="preview" contenteditable="true" class="preview"></div>
+        <div class="status" id="status">Waiting...</div>
 
-<div class="status" id="status">Waiting...</div>
+        <div class="metrics" id="metrics">
+            Characters: 0 · Estimated lines: 1 · Longest word: 0
+        </div>
+    </div>
 
-<div class="metrics" id="metrics">Characters: 0 · Estimated lines: 1 · Longest word: 0</div>
+    <h2>Guidelines</h2>
+    <ul>
+        <li>Maximum <strong>2 lines</strong> inside 124 px width.</li>
+        <li>Prefer <strong>up to 3 short words</strong>.</li>
+        <li>
+            Avoid very long compound words (more than ~14 characters).
+        </li>
+        <li>
+            If it doesn't fit: use a <strong>shorter alternative</strong>.
+        </li>
+    </ul>
 
-<h2>Guidelines</h2>
-<ul>
-    <li>Maximum <strong>2 lines</strong> inside 124 px width.</li>
-    <li>Prefer <strong>up to 3 short words</strong>.</li>
-    <li>Avoid very long compound words (more than ~14 characters).</li>
-    <li>If it doesn't fit: use a <strong>shorter alternative</strong>.</li>
-</ul>
+    <script>
+        const preview = document.getElementById("preview");
+        const status = document.getElementById("status");
+        const metrics = document.getElementById("metrics");
 
-<script>
-const preview = document.getElementById("preview");
-const status = document.getElementById("status");
-const metrics = document.getElementById("metrics");
+        const LONG_WORD_LIMIT = 14; // символов в одном слове
 
-// count longest word
-function getLongestWordLength(text) {
-    const words = text.split(/[\s\n]+/).filter(w => w.length > 0);
-    if (words.length === 0) return 0;
-    return Math.max(...words.map(w => w.length));
-}
-
-function update() {
-    const text = preview.innerText.trim();
-
-    requestAnimationFrame(() => {
-        const lineHeight = parseFloat(getComputedStyle(preview).lineHeight);
-        const height = preview.scrollHeight;
-        const lines = Math.round(height / lineHeight);
-
-        const longestWord = getLongestWordLength(text);
-
-        // logic
-        if (lines > 2) {
-            status.className = "status warn";
-            status.textContent = `✘ Too long (${lines} lines) — please shorten`;
-        } else if (longestWord > 14) {
-            status.className = "status warn-soft";
-            status.textContent = `✔ Fits in 2 lines, but contains a very long word — shorten if possible.`;
-        } else {
-            status.className = "status ok";
-            status.textContent = `✔ Fits in 2 lines`;
+        function getCleanText() {
+            // убираем лишние пробелы и переносы
+            return preview.innerText.replace(/\s+/g, " ").trim();
         }
 
-        metrics.textContent =
-            `Characters: ${text.length} · Estimated lines: ${lines} · Longest word: ${longestWord}`;
-    });
-}
+        function update() {
+            const text = getCleanText();
 
-// placeholder behaviour
-preview.addEventListener("focus", () => {
-    if (preview.textContent === "Type here...") {
-        preview.textContent = "";
-    }
-});
+            if (!text) {
+                status.className = "status";
+                status.textContent = "Waiting...";
+                metrics.textContent =
+                    "Characters: 0 · Estimated lines: 1 · Longest word: 0";
+                return;
+            }
 
-preview.addEventListener("blur", () => {
-    if (preview.textContent.trim() === "") {
-        preview.textContent = "Type here...";
-    }
-});
+            // даём браузеру дорисовать высоту
+            requestAnimationFrame(() => {
+                const lineHeight = parseFloat(
+                    getComputedStyle(preview).lineHeight
+                );
+                const height = preview.scrollHeight;
+                const lines = Math.round(height / lineHeight);
 
-preview.addEventListener("input", update);
+                // считаем самое длинное слово
+                const words = text.split(" ");
+                let longest = 0;
+                for (const w of words) {
+                    if (w.length > longest) longest = w.length;
+                }
 
-// initial placeholder
-preview.textContent = "Type here...";
-update();
-</script>
+                let cls = "status ok";
+                let msg = "✔ Fits in 2 lines";
 
+                if (lines > 2) {
+                    cls = "status error";
+                    msg = `✘ Too long (${lines} lines) — please shorten`;
+                } else if (longest > LONG_WORD_LIMIT) {
+                    cls = "status warn";
+                    msg =
+                        "▲ Fits in 2 lines, but contains a very long word — shorten if possible.";
+                }
+
+                status.className = cls;
+                status.textContent = msg;
+                metrics.textContent = `Characters: ${text.length} · Estimated lines: ${lines} · Longest word: ${longest}`;
+            });
+        }
+
+        // Обновляем при вводе
+        preview.addEventListener("input", update);
+
+        // Чтобы плейсхолдер работал через :empty — очищаем div, если всё стерли
+        preview.addEventListener("blur", () => {
+            if (!getCleanText()) {
+                preview.innerHTML = "";
+                update();
+            }
+        });
+
+        // Первичное состояние
+        update();
+    </script>
 </body>
 </html>
