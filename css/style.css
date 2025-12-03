@@ -20,7 +20,7 @@ p {
 .preview {
     width: 124px;
     min-height: 40px;
-    max-height: 40px;            /* ровно 2 строки при line-height 20px */
+    max-height: 40px;              /* ровно 2 строки при line-height 20px */
     padding: 12px;
 
     background: #1a1a1a;
@@ -31,7 +31,7 @@ p {
     font-size: 15px;
     line-height: 20px;
 
-    overflow: hidden;            /* третью строку не показываем */
+    overflow: hidden;              /* третью строку не показываем */
     white-space: normal;
     word-break: break-word;
 
@@ -40,7 +40,7 @@ p {
 }
 
 .preview.placeholder {
-    color: #777777;              /* более бледный плейсхолдер */
+    color: #777777;
 }
 
 .status {
@@ -54,6 +54,10 @@ p {
 
 .status.warn {
     color: #ff5d5d;
+}
+
+.status.warn-soft {
+    color: #ffd75d;                /* мягкое предупреждение (жёлтое) */
 }
 
 .metrics {
