@@ -16,28 +16,33 @@ p {
     color: #cccccc;
 }
 
+/* Плашка-превью */
 .preview {
+    box-sizing: border-box;
     width: 124px;
-    min-height: 40px;
-    max-height: 40px;          /* две строки по 20px */
-    padding: 10px 12px;
+
+    /* делаем её визуально выше */
+    min-height: 56px;         /* две строки + запас */
+    max-height: 56px;
+
+    padding: 16px 12px;
     margin-top: 24px;
 
     background: #181818;
     border: 2px solid #333333;
-    border-radius: 14px;
+    border-radius: 16px;
 
     font-size: 15px;
     line-height: 20px;
 
-    overflow: hidden;          /* третью строку не показываем */
+    overflow: hidden;          /* 3-ю строку не показываем */
     white-space: normal;
     word-break: break-word;
 
     outline: none;
 }
 
-/* статус под тайлом */
+/* статус под плашкой */
 .status {
     margin-top: 12px;
     font-size: 16px;
@@ -53,7 +58,7 @@ p {
 }
 
 .status.warn {
-    color: #ffd75a;            /* ЖЁЛТЫЙ для длинного слова */
+    color: #ffcc00;            /* ЯРКО-ЖЁЛТЫЙ для длинного слова */
 }
 
 /* метрики */
