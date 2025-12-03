@@ -16,14 +16,9 @@
     <strong>124 px</strong>. If the text overflows to a 3rd line, please shorten it.
 </p>
 
-<!-- Видимый тайл -->
 <div id="preview" class="preview" contenteditable="true"></div>
 
-<!-- Скрытый двойник для точного измерения высоты текста -->
-<div id="measure" class="preview preview-measure" aria-hidden="true"></div>
-
-<div id="status" class="status">Waiting...</div>
-
+<div id="status" class="status">Waiting…</div>
 <div id="metrics" class="metrics">
     Characters: 0 · Estimated lines: 1 · Longest word: 0
 </div>
@@ -37,92 +32,56 @@
 </ul>
 
 <script>
-(function () {
-    const preview  = document.getElementById("preview");
-    const measure  = document.getElementById("measure");
-    const status   = document.getElementById("status");
-    const metrics  = document.getElementById("metrics");
+const preview = document.getElementById('preview');
+const status  = document.getElementById('status');
+const metrics = document.getElementById('metrics');
 
-    const LINE_HEIGHT = 20;          // px, как в дизайне
-    const LONG_WORD_LIMIT = 14;      // длина слова для жёлтого ворнинга
+// основная функция проверки
+function update() {
+    const rawText = preview.innerText.replace(/\n+$/g, '').trim();
+    requestAnimationFrame(() => {
+        const style = getComputedStyle(preview);
+        const lineHeight   = parseFloat(style.lineHeight)   || 20;
+        const paddingTop   = parseFloat(style.paddingTop)   || 0;
+        const paddingBottom= parseFloat(style.paddingBottom)|| 0;
 
-    let isPlaceholder = true;
+        // высота содержимого без паддингов
+        const contentHeight = preview.scrollHeight - paddingTop - paddingBottom;
+        const lines = Math.max(1, Math.round(contentHeight / lineHeight));
 
-    function setPlaceholder() {
-        isPlaceholder = true;
-        preview.classList.add("placeholder");
-        preview.textContent = "Type here…";
-        update(true); // считаем как пустое поле
-    }
+        const words = rawText.split(/\s+/).filter(Boolean);
+        const longestWord = words.reduce((m, w) => Math.max(m, w.length), 0);
 
-    function clearPlaceholder() {
-        if (!isPlaceholder) return;
-        isPlaceholder = false;
-        preview.classList.remove("placeholder");
-        preview.textContent = "";
-    }
+        let cls = 'status';
+        let msg = '';
 
-    function getText() {
-        if (isPlaceholder) return "";
-        return preview.textContent.replace(/\u200B/g, "").trim();
-    }
-
-    function update(forceEmpty) {
-        const text = forceEmpty ? "" : getText();
-
-        // обновляем скрытый измеритель
-        measure.textContent = text || " "; // чтобы высота не была 0
-
-        const height = measure.scrollHeight;
-        let lines = Math.round(height / LINE_HEIGHT);
-        if (!text) lines = 1;
-
-        const chars = text.length;
-
-        // самое длинное слово
-        let longestWord = 0;
-        if (text) {
-            const words = text.split(/\s+/).filter(Boolean);
-            longestWord = words.reduce(
-                (max, w) => Math.max(max, w.length),
-                0
-            );
-        }
-
-        // состояние
-        if (!text) {
-            status.className = "status";
-            status.textContent = "Waiting...";
+        if (!rawText) {
+            msg = 'Waiting…';
         } else if (lines > 2) {
-            status.className = "status status-error";
-            status.textContent = `✘ Too long (${lines} lines) — please shorten`;
-        } else if (longestWord > LONG_WORD_LIMIT) {
-            status.className = "status status-warn";
-            status.textContent =
-                "✔ Fits in 2 lines, but contains a very long word — shorten if possible.";
+            cls += ' error';
+            msg = `✘ Too long (${lines} lines) — please shorten`;
+        } else if (longestWord > 14) {
+            cls += ' warn';
+            msg = '✔ Fits in 2 lines, but contains a very long word — shorten if possible.';
         } else {
-            status.className = "status status-ok";
-            status.textContent = "✔ Fits in 2 lines";
+            cls += ' ok';
+            msg = '✔ Fits in 2 lines';
         }
+
+        status.className = cls;
+        status.textContent = msg;
 
         metrics.textContent =
-            `Characters: ${chars} · Estimated lines: ${lines} · Longest word: ${longestWord}`;
-    }
-
-    // события
-    preview.addEventListener("focus", () => {
-        clearPlaceholder();
+            `Characters: ${rawText.length} · Estimated lines: ${lines} · Longest word: ${longestWord}`;
     });
+}
 
-    preview.addEventListener("blur", () => {
-        if (!getText()) setPlaceholder();
-    });
+// слушаем ввод
+preview.addEventListener('input', update);
+preview.addEventListener('keyup', update);
 
-    preview.addEventListener("input", () => update(false));
-
-    // старт
-    setPlaceholder();
-})();
+// первая инициализация
+update();
 </script>
 
 </body>
