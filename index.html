@@ -1,97 +1,69 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Title tester (124px / max 2 lines)</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <!-- Roboto -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;600&display=swap"
-    rel="stylesheet"
-  >
-
-  <!-- Стили: файл лежит рядом с index.html -->
-  <link rel="stylesheet" href="style.css" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Title tester (124px / max 2 lines)</title>
+    <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
-  <main class="page">
-    <header class="header">
-      <h1>Title tester (124px / max 2 lines)</h1>
-      <p>
-        Type your translation <b>directly in the preview tile</b> below.
-        It uses <b>Roboto 15px / line-height 20px</b> and fixed width
-        <b>124 px</b>. If the text overflows to a 3rd line, please shorten it.
-      </p>
-    </header>
 
-    <section class="content">
-      <div class="preview-column">
-        <div class="preview-label">Preview</div>
+<h1>Title tester (124px / max 2 lines)</h1>
 
-        <div class="tile-preview">
-          <div
-            id="preview"
-            class="tile-preview-inner"
-            contenteditable="true"
-          ></div>
-        </div>
+<p>
+    Type your translation directly in the preview tile below.
+    It uses <strong>Roboto 15px / line-height 20px</strong>
+    and fixed width <strong>124 px</strong>.<br />
+    If the text overflows to a 3rd line, please shorten it.
+</p>
 
-        <div id="status" class="status ok">
-          <span class="dot"></span>
-          <span>Fits in 2 lines</span>
-        </div>
+<div id="preview" contenteditable="true" class="preview"></div>
 
-        <div id="metrics" class="metrics"></div>
-      </div>
+<div class="status" id="status">Waiting…</div>
 
-      <div class="guidelines-column">
-        <div class="preview-label">Guidelines</div>
-        <ul class="hint-list">
-          <li>Maximum <b>2 lines</b> inside 124 px width.</li>
-          <li>Prefer <b>up to 3 short words</b>.</li>
-          <li>Avoid very long compound words.</li>
-          <li>If it doesn't fit: use a <b>shorter alternative</b>.</li>
-        </ul>
-      </div>
-    </section>
-  </main>
+<div class="metrics" id="metrics">Characters: 0 · Estimated lines: 1</div>
 
-  <script>
-    const preview = document.getElementById('preview');
-    const status = document.getElementById('status');
-    const metrics = document.getElementById('metrics');
+<h2>Guidelines</h2>
+<ul>
+    <li>Maximum <strong>2 lines</strong> inside 124 px width.</li>
+    <li>Prefer <strong>up to 3 short words</strong>.</li>
+    <li>Avoid very long compound words.</li>
+    <li>If it doesn't fit: use a <strong>shorter alternative</strong>.</li>
+</ul>
 
-    function update() {
-      const text = (preview.textContent || "").trim();
+<script>
+const preview = document.getElementById("preview");
+const status = document.getElementById("status");
+const metrics = document.getElementById("metrics");
 
-      requestAnimationFrame(() => {
-        const style = getComputedStyle(preview);
-        const lineHeight =
-          parseFloat(style.lineHeight || "20") || 20;
+// Update evaluation
+function update() {
 
+    // Wait for browser to render new text to measure height
+    requestAnimationFrame(() => {
+        const lineHeight = parseFloat(getComputedStyle(preview).lineHeight);
         const height = preview.scrollHeight;
         const lines = Math.round(height / lineHeight);
 
         if (lines <= 2) {
-          status.className = "status ok";
-          status.lastElementChild.textContent = "Fits in 2 lines";
+            status.className = 'status ok';
+            status.textContent = '✔ Fits in 2 lines';
         } else {
-          status.className = "status warn";
-          status.lastElementChild.textContent =
-            `Too long (${lines} lines) – please shorten`;
+            status.className = 'status warn';
+            status.textContent = `✘ Too long (${lines} lines) — please shorten`;
         }
 
-        metrics.textContent =
-          `Characters: ${text.length} · Estimated lines: ${lines}`;
-      });
-    }
+        metrics.textContent = `Characters: ${preview.innerText.trim().length} · Estimated lines: ${lines}`;
+    });
+}
 
-    preview.addEventListener("input", update);
-    // начальный вызов
-    update();
-  </script>
+// Listen for edits
+preview.addEventListener('input', update);
+
+// Initial content to make the tile visible
+preview.textContent = "Type here…";
+update();
+</script>
+
 </body>
 </html>
